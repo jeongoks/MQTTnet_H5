@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Text.Json;
+using MQTTNet_Console.Models;
 
 namespace MQTTNet_Console.Helpers
 {
@@ -40,11 +41,17 @@ namespace MQTTNet_Console.Helpers
                 mqttClient.ApplicationMessageReceivedAsync += e =>
                 {
                     Console.WriteLine("Received application message.");
-                    string message = System.Text.Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment);
-                    Console.Write("Your message is: ");
-                    Console.WriteLine(message);
+                    Console.WriteLine();
+                    string message = Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment);
+                    Telemetry telemetry = JsonSerializer.Deserialize<Telemetry>(message);
+                    Console.WriteLine($"Your received message is: {message}");
+                    Console.WriteLine();
+                    Console.WriteLine("After deserializing your incoming message:");
+                    Console.WriteLine($"Temperature: {telemetry.Temperature}"); 
+                    Console.WriteLine($"Humidity: {telemetry.Humidity}");
+                    Console.WriteLine($"Time: {telemetry.Time}");
 
-                    Console.WriteLine("Press enter to exit.");
+                    Console.WriteLine("Press ESC to exit or wait for a message.");
                     Console.ReadLine();
 
                     return Task.CompletedTask;
@@ -62,7 +69,7 @@ namespace MQTTNet_Console.Helpers
 
                 Console.WriteLine("MQTT client subscribed to topic.");
 
-                Console.WriteLine("Press enter to exit or wait for a message.");
+                Console.WriteLine("Press ESC to exit or wait for a message.");
                 Console.ReadLine();
             }
         }
